@@ -1,74 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Threading;
 
 namespace Game_Jump
 {
     public partial class Game_level_one : Form
     {
-        KeyEventArgs eventArgs = new KeyEventArgs(true);
-        public static bool win = false;
+        public bool go = false, win = false;
         public Game_level_one()
         {
-            InitializeComponent();   
+            InitializeComponent();
+            Finish.ImageLocation = @"https://static8.depositphotos.com/1472772/978/i/950/depositphotos_9787455-stock-photo-finish-flags.jpg";
+            Finish.SizeMode = PictureBoxSizeMode.StretchImage;
         }
-        public class KeyEventArgs : EventArgs
-        {            
-            public Keys KeyCode { get; set; }
-            public KeyEventArgs(bool Start)
-            {
-                Thread up = new Thread(UP);
-                up.Start();
-                up.Join(100);
-                Thread left = new Thread(LEFT);
-                left.Start();
-                left.Join(100);
-                Thread right = new Thread(RIGHT);
-                right.Start();
-                right.Join(100);
-            }  
-            public KeyEventArgs()
-            { }
-            public void UP()
-            {
-                while (win == false)
-                {
-                    if (this.KeyCode == Keys.W)
-                    {
-                        MessageBox.Show("sdf");
-                    }
-                    Thread.Sleep(100);
-                }
-            }
-            public void LEFT()
-            {
-                while (win == false)
-                {
-                    if (this.KeyCode == Keys.A)
-                    {
-                        MessageBox.Show("sdf");
-                    }
-                    Thread.Sleep(100);
-                }
-            }
-            public void RIGHT()
-            {
-                while (win == false)
-                {
-                    if (this.KeyCode == Keys.D)
-                    {
-                        MessageBox.Show("sdf");
-                    }
-                    Thread.Sleep(100);
-                }
-            }
+        public void UP()
+        {
+            Game_Person.Top -= 10;            
+        }
+        public void DOWN()
+        {
+            Game_Person.Top += 10;
+        }
+        public void LEFT()
+        {
+            Game_Person.Left -= 10;
+        }
+        public void RIGHT()
+        {
+            Game_Person.Left += 10;
         }
         private void Game_level_one_Load(object sender, EventArgs e)
         {
@@ -76,13 +35,68 @@ namespace Game_Jump
         }
         private void Start_button_Click(object sender, EventArgs e)
         {
-            Game_time.Start();           
-        }
-        private void Game_time_Tick(object sender, EventArgs e)
+            go = true;
+        }      
+        private void Game_level_one_KeyDown(object sender, KeyEventArgs e)
         {
-            eventArgs.UP();
-            eventArgs.LEFT();
-            eventArgs.RIGHT();
+            if (go == true)
+            {
+                if (Local())
+                {
+                    if (e.KeyValue == (char)Keys.D)                   
+                        RIGHT();                   
+                    if (e.KeyValue == (char)Keys.A)                   
+                        LEFT();                   
+                    if (e.KeyValue == (char)Keys.W)                   
+                        UP();                    
+                    if (e.KeyValue == (char)Keys.S)                    
+                        DOWN();                   
+                }
+                else
+                    Game_Person.Location = new Point(15, 200);
+            }
+            if(win == true)
+            {
+                var Yes = MessageBox.Show("Пройти уровень еще раз?", "Победа!", MessageBoxButtons.YesNo);
+                if (Yes == DialogResult.Yes)
+                {
+                    win = false;
+                    go = true;
+                    Game_Person.Location = new Point(15, 200);
+                }
+                else
+                    Application.Exit();
+            }
+            if (e.KeyValue == (char)Keys.Escape)
+                Application.Exit();
+        }
+        public bool Local()
+        {
+            if(Game_Person.Top < 220 && Game_Person.Left > 110 && Game_Person.Left < 170)           
+                return false;
+            if (Game_Person.Top > 60 && Game_Person.Left > 240 && Game_Person.Left < 300)
+                return false;
+            if (Game_Person.Top < 210 && Game_Person.Left > 380 && Game_Person.Left < 600)
+                return false;
+            if (Game_Person.Top > 190 && Game_Person.Top < 260 && Game_Person.Left > 620 && Game_Person.Left < 680)
+                return false;
+            if (Game_Person.Top > 250 && Game_Person.Top < 380 && Game_Person.Left > 520 && Game_Person.Left < 660)
+                return false;
+            if (Game_Person.Top > 320 && Game_Person.Left > 350 && Game_Person.Left < 440)
+                return false;
+            if(Game_Person.Top > 80 && Game_Person.Top < 160 && Game_Person.Left > 640 && Game_Person.Left < 720)
+            {
+                win = true;
+                go = false;
+            }
+            return true;
+        }
+        private void Game_field_Click(object sender, EventArgs e)
+        { }
+        private void End_Click(object sender, EventArgs e)
+        {
+            go = false;
+            Game_Person.Location = new Point(15, 200);
         }
     }
 }
